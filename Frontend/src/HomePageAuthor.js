@@ -29,6 +29,9 @@ import Home from './images/homeicon.png';
 import Wishlist from './images/wishlisticon.png';
 import Profile from './images/profileicon.png';
 
+const BACKEND_URL = "https://flipthepage.onrender.com";
+// const BACKEND_URL = "http://localhost:5000";
+
 function HomePageAuthor() {
 
     const navigate = useNavigate();
@@ -38,21 +41,21 @@ function HomePageAuthor() {
     useEffect(() => {
         fetchBooks();
     }, []);
-    
+
 
     const fetchBooks = async () => {
         try {
             setLoading(true);
             // console.log('Fetching books...'); // Debug log
 
-            const response = await axios.get('http://localhost:5000/getAllBooks');
+            const response = await axios.get(`${BACKEND_URL}/getRecentBooks`);
             // console.log('API Response:', response.data); // Debug log
 
             if (response.data && response.data.books) {
                 // console.log('Setting books:', response.data.books);
                 setBooks(response.data.books);
             } else {
-                console.log('No books in response');
+                // console.log('No books in response');
                 setBooks([]);
             }
         } catch (error) {
@@ -80,46 +83,26 @@ function HomePageAuthor() {
         navigate('/Wishlist');
     };
 
+    const scrollToDeals = () => {
+        document.querySelector('.deals').scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+    };
+
     return (
         <div className="homepage-author">
             <ToastContainer />
             <header className="header">
                 <img src={Logo} alt="FlipThePage Logo" className="logo" />
                 <div className="search-container">
-                    <input 
-                        type="text" 
-                        placeholder="Search ebooks" 
-                        className="search-bar" 
-                        onClick={handleSearchClick}
-                        readOnly
-                    />
-                    <img 
-                        src={searchicon} 
-                        alt="Search Icon" 
-                        className="searchicon" 
-                        onClick={handleSearchClick}
-                    />
+                    <input onClick={handleSearchClick} type="text" placeholder="Search ebooks" className="search-bar" />
+                    <img src={searchicon} alt="Search Icon" className="searchicon" />
                 </div>
                 <div className="icon-links">
-                    <img 
-                        src={Home} 
-                        alt="Home" 
-                        className="header-icon active"
-                    />
-                    <img 
-                        src={Wishlist} 
-                        alt="Wishlist" 
-                        className="header-icon" 
-                        onClick={handleWishlistClick}
-                        style={{ cursor: 'pointer' }}
-                    />
-                    <img 
-                        src={Profile} 
-                        alt="Profile" 
-                        className="header-icon" 
-                        onClick={handleProfileClick}
-                        style={{ cursor: 'pointer' }}
-                    />
+                    <img src={Home} alt="Icon1" className="header-icon-reader" onClick={() => navigate('/reader')} />
+                    <img src={Wishlist} alt="Icon2" className="header-icon-wishlist" onClick={() => navigate('/Wishlist')} />
+                    <img src={Profile} alt="Icon3" className="header-icon-profile" onClick={() => navigate('/author-profile')} />
                 </div>
             </header>
 
@@ -142,7 +125,7 @@ function HomePageAuthor() {
             <section className="genres">
                 <div className="genres-header">
                     <h2>Popular Genres</h2>
-                    <a href="/genres" className="see-more-genres">Browse</a>
+                    <a href="/genres" className="see-more-genres" onClick={scrollToDeals}>Browse</a>
                 </div>
                 <div className="genres-list">
                     <div className="genre-item">
@@ -166,7 +149,7 @@ function HomePageAuthor() {
 
 
             <section className="deals">
-                <h2>Deals of the week</h2>
+                <h2>Featured Books</h2>
                 <div className="deal-cards">
                     {loading ? (
                         <div>Loading...</div>

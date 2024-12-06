@@ -8,6 +8,9 @@ import axios from "axios";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+const BACKEND_URL = "https://flipthepage.onrender.com";
+// const BACKEND_URL = "http://localhost:5000";
+
 function LoginPage() {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
@@ -15,14 +18,14 @@ function LoginPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault(); // Prevent page refresh
-    console.log(username, password);
+    // console.log(username, password);
     axios
-      .post("http://localhost:5000/login", {
+      .post(`${BACKEND_URL}/login`, {
         username: username,
         password: password,
       })
       .then((res) => {
-        console.log(res.data);
+        // console.log(res.data);
 
         if (res.data.code === 400) {
           toast.error(res.data.msg);
@@ -85,10 +88,7 @@ function LoginPage() {
             type="password"
             placeholder="Password"
           />
-          <div className="remember-me">
-            <input type="checkbox" id="remember" />
-            <label htmlFor="remember">Remember Me</label>
-          </div>
+
           <button onClick={handleSubmit} type="submit" className="register-btn">
             Log In
           </button>
@@ -96,7 +96,7 @@ function LoginPage() {
         <div className="additional-options">
           <Link to="/forgot-password">Forgot Password?</Link>
         </div>
-        <button className="google-login">Continue with Google</button>
+
 
         {/* Replaced anchor tag with Link component */}
         <p className="register-link">

@@ -29,6 +29,9 @@ import Home from './images/homeicon.png';
 import Wishlist from './images/wishlisticon.png';
 import Profile from './images/profileicon.png';
 
+const BACKEND_URL = "https://flipthepage.onrender.com";
+// const BACKEND_URL = "http://localhost:5000";
+
 function HomePageReader() {
     const navigate = useNavigate();
     const [books, setBooks] = useState([]);
@@ -52,7 +55,7 @@ function HomePageReader() {
             setLoading(true);
             // console.log('Fetching books...'); // Debug log
 
-            const response = await axios.get('http://localhost:5000/getAllBooks');
+            const response = await axios.get(`${BACKEND_URL}/getRecentBooks`);
             // console.log('API Response:', response.data); // Debug log
             // console.log('API Response:', response.dat); // Debug log
             // Debug log
@@ -85,6 +88,13 @@ function HomePageReader() {
         navigate(`/book/${bookId}`);
     };
 
+    const scrollToDeals = () => {
+        document.querySelector('.deals').scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+    };
+
     return (
         <div className="homepage-reader">
 
@@ -96,9 +106,9 @@ function HomePageReader() {
                     <img src={searchicon} alt="Search Icon" className="searchicon" />
                 </div>
                 <div className="icon-links">
-                    <img src={Home} alt="Icon1" className="header-icon active" onClick={() => navigate('/reader')} />
-                    <img src={Wishlist} alt="Icon2" className="header-icon" onClick={() => navigate('/Wishlist')} />
-                    <img src={Profile} alt="Icon3" className="header-icon" onClick={() => navigate('/reader-profile')} />
+                    <img src={Home} alt="Icon1" className="header-icon-reader" onClick={() => navigate('/reader')} />
+                    <img src={Wishlist} alt="Icon2" className="header-icon-wishlist" onClick={() => navigate('/Wishlist')} />
+                    <img src={Profile} alt="Icon3" className="header-icon-profile" onClick={() => navigate('/reader-profile')} />
                 </div>
             </header>
 
@@ -106,7 +116,7 @@ function HomePageReader() {
                 <div className="featured-text">
                     <p className="featured-heading">FLIPTHEPAGE RECOMMENDATION</p>
                     <h2>Featured Books of the<span>{getCurrentMonth()}</span></h2>
-                    <button className="see-more-btn">See More</button>
+                    <button className="see-more-btn" onClick={scrollToDeals}>See More</button>
                 </div>
                 <div className="featured-images">
                     <img src={FeaturedBooks} alt="Featured Books" />
@@ -142,7 +152,7 @@ function HomePageReader() {
 
 
             <section className="deals">
-                <h2>Deals of the week</h2>
+                <h2>Featured Books</h2>
                 <div className="deal-cards">
                     {loading ? (
                         <div className="loading-spinner">Loading books...</div>

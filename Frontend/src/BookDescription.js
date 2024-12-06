@@ -4,7 +4,7 @@ import carticon from './images/carticon.png';
 import homeicon from './images/homeicon.png';
 import dropdownicon from './images/dropdownicon.png';
 import wishlisticon from './images/wishlisticon.png';
-import fliplogo from './images/logo.svg';
+import logo from './images/logo.svg';
 import searchIcon from './images/searchicon.png';
 import profileicon from './images/profileicon.png';
 import { Link, useParams, useNavigate } from 'react-router-dom';
@@ -14,6 +14,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
+
+const BACKEND_URL = "https://flipthepage.onrender.com";
+// const BACKEND_URL = "http://localhost:5000";
 
 // Set worker
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
@@ -25,6 +28,7 @@ export default function BookDescription() {
   const [loading, setLoading] = useState(true);
   const [isInWishlist, setIsInWishlist] = useState(false);
   const [wishlistMessage, setWishlistMessage] = useState("");
+  const [activeicon, setActiveicon] = useState("profile");
   const storedUsername = localStorage.getItem('USERNAME');
   const [userRole, setUserRole] = useState('');
 
@@ -46,7 +50,7 @@ export default function BookDescription() {
 
   useEffect(() => {
     // Fetch user role
-    axios.get(`http://localhost:5000/myProfile/${storedUsername}`)
+    axios.get(`${BACKEND_URL}/myProfile/${storedUsername}`)
       .then(response => {
         if (response.data.code === 100) {
           setUserRole(response.data.user.userRole);
@@ -84,10 +88,10 @@ export default function BookDescription() {
   const fetchBookDetails = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`http://localhost:5000/book/${id}`);
+      const response = await axios.get(`${BACKEND_URL}/book/${id}`);
 
       if (response.data && response.data.code === 200) {
-        console.log('Book details:', response.data.book);
+        // console.log('Book details:', response.data.book);
         setBook(response.data.book);
       } else {
         toast.error('Book not found');
@@ -103,7 +107,7 @@ export default function BookDescription() {
   const checkWishlist = async () => {
     try {
       if (book && storedUsername) {
-        const response = await axios.get(`http://localhost:5000/checkWishlist?username=${storedUsername}&bookId=${book._id}`);
+        const response = await axios.get(`${BACKEND_URL}/checkWishlist?username=${storedUsername}&bookId=${book._id}`);
         if (response.data.exists) {
           setIsInWishlist(true);
           setWishlistMessage("Added to wishlist");
@@ -128,13 +132,13 @@ export default function BookDescription() {
       };
 
       if (!isInWishlist) {
-        const response = await axios.post('http://localhost:5000/addToWishlist', wishlistData);
+        const response = await axios.post(`${BACKEND_URL}/addToWishlist`, wishlistData);
         if (response.data.code === 300) {
           setWishlistMessage("Added to wishlist");
           setIsInWishlist(true);
         }
       } else {
-        const response = await axios.post('http://localhost:5000/rmFromWishlist', wishlistData);
+        const response = await axios.post(`${BACKEND_URL}/rmFromWishlist`, wishlistData);
         if (response.data.code === 501) {
           setWishlistMessage("Add to wishlist");
           setIsInWishlist(false);
@@ -154,13 +158,13 @@ export default function BookDescription() {
 
   const handleReadClick = () => {
     setIsLoading(true);
-    if (book) {
-      console.log('PDF URL:', book.file);
-    }
+    // if (book) {
+      // console.log('PDF URL:', book.file);
+    // }
     setPdfError(null);
     setShowReader(true);
 
-    axios.post("http://localhost:5000/addHistory", {
+    axios.post(`${BACKEND_URL}/addHistory`, {
       username: storedUsername,
       bookTitle: book.title,
       author: book.author,
@@ -215,6 +219,10 @@ export default function BookDescription() {
     }
   };
 
+  const handleIconClick = (icon) => {
+    setActiveicon(icon);
+  };
+
   if (loading) {
     return <div className="loading">Loading...</div>;
   }
@@ -256,26 +264,32 @@ export default function BookDescription() {
       {!showReader ? (
         <>
           {/* Header Section */}
-          <header className="author-header">
-            <div className="logo-icon">
-              <img src={fliplogo} alt="FlipThePage" className="logo" />
+          <header className="book-description-head">
+            <div className="flip-the-page">
+              <img src={logo} alt="Logo" className="logo" />
             </div>
-            <div className="actions">
-              <img 
-                src={homeicon} 
-                alt="home" 
-                onClick={handleHomeClick}
-                style={{ cursor: 'pointer' }}
-              />
-              <Link to="/wishlist" className="wishlist">
-                <img src={wishlisticon} alt="wishlist" />
+            <div className="nav-icons">
+              <Link to={userRole?.toUpperCase() === 'READER' ? '/reader' : '/author'} onClick={() => handleHomeClick("home")}>
+                <img
+                  src={homeicon}
+                  alt="Home"
+                  className={`homeicon ${activeicon === "home" ? "" : ""}`}
+                />
               </Link>
-              <img 
-                src={profileicon} 
-                alt="profile-photo" 
-                onClick={handleProfileClick}
-                style={{ cursor: 'pointer' }}
-              />
+              <Link to="/Wishlist" onClick={() => handleIconClick("wishlist")}>
+                <img
+                  src={wishlisticon}
+                  alt="Wishlist"
+                  className={`wishlisticon ${activeicon === "wishlist" ? "" : ""}`}
+                />
+              </Link>
+              <Link to={userRole?.toUpperCase() === 'READER' ? '/reader-profile' : '/author-profile'} onClick={() => handleProfileClick("profile")}>
+                <img
+                  src={profileicon}
+                  alt="Profile"
+                  className={`profileicon ${activeicon === "profile" ? "" : ""}`}
+                />
+              </Link>
             </div>
           </header>
 

@@ -1,17 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './BookDescription.css';
 
 // Import images
-import fliplogo from './images/logo.svg';
+import logo from './images/logo.svg';
 import homeicon from './images/homeicon.png';
+
+const BACKEND_URL = "https://flipthepage.onrender.com";
+// const BACKEND_URL = "http://localhost:5000";
 
 export default function BookDescriptionBeforeLogin() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [activeicon] = useState("profile");
   const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showReader, setShowReader] = useState(false);
@@ -23,7 +27,7 @@ export default function BookDescriptionBeforeLogin() {
   const fetchBookDetails = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`http://localhost:5000/book/${id}`);
+      const response = await axios.get(`${BACKEND_URL}/book/${id}`);
 
       if (response.data && response.data.code === 200) {
         setBook(response.data.book);
@@ -54,17 +58,18 @@ export default function BookDescriptionBeforeLogin() {
     <div className="book-page">
       {!showReader ? (
         <>
-          <header className="author-header">
-            <div className="logo-icon">
-              <img src={fliplogo} alt="FlipThePage" className="logo" />
+          <header className="book-description-head">
+            <div className="flip-the-page">
+              <img src={logo} alt="Logo" className="logo" />
             </div>
-            <div className="actions">
-              <img 
-                src={homeicon} 
-                alt="home" 
-                onClick={handleHomeClick}
-                style={{ cursor: 'pointer' }}
-              />
+            <div className="nav-icons">
+              <Link to="/home" onClick={() => handleHomeClick("home")}>
+                <img
+                  src={homeicon}
+                  alt="Home"
+                  className={`homeicon ${activeicon === "home" ? "" : ""}`}
+                />
+              </Link>
             </div>
           </header>
 
